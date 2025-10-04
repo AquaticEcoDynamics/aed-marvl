@@ -1,8 +1,6 @@
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
-# aed-marvl
-
-![image](docs/MARVL-overview.png)
+# aed-marvl : scripts for visualisation and assessment of AED model output 
 
 ## Overview
 MARVL is an integrated software package for visualizing the model outputs and observational datasets, and evaluating the model performance.  It is also able to carry out high-level system assessment such and environmental response functions and nutrient budgeting analysis, though certain pre-processing steps are required to prepare the data for the high-level system assessment. One of the key challenges for water quality modelling is to assess the model performance against field observations that typically include plenty of biogeochemical variables, exist at multiple sites, and are provided by multiple agencies in different formats. To handle this challenge, the AED research group has developed a series of data processing framework to store the data in a uniform format that is compatible to the AED outputs. At the same time, the group has developed a series of model assessment methods and scripts that were specifically designed to be compatible with the AED data repository and model outputs. The repository is a collection of AED inhouse scripts that have been developed during previous research projects, and has been refined with uniform and easier user interfaces. At the moment, the AED-MARVL was designed with the following features:
@@ -23,7 +21,7 @@ Following visualizing functions are available in MARVL:
 
 High-level systematic assessment of water quality response of to environmental factors and nutrient budgeting analysis have been developed using many of the basic functions of MARVL. However, these high level assessments require several pre-processing steps to prepare data for the assessment, and the configurations and pre-processing varied in different case studies. Therefore, there is still no straightforward script for these high level assessments. We have included the workflow in this document and examples scripts/outputs of the high-level assessments in the MARVL repository. Users of MARVL can follow the workflow and modify the scripts to produce the assessment outcomes of their studies.
 
-The plotting functions have been tested within several case studies, including Coorong Lagoon, Cockburn Sound, and Lake Erie, and  examples are included in the current repository. However, MARVL is still in its developing phase. We are expecting feedbacks for us to improve the user experience, as well as functionalities.
+The plotting functions have been tested within several case studies, including Coorong Lagoon, Cockburn Sound, and Lake Erie, and examples are included in the current repository. However, MARVL is still under development and please provide feedback for us to improve the user experience, as well as functionality.
 
 ## Repository Organisation
 - `docs`: place holder for documenting MARVL science and user instructions;
@@ -47,5 +45,5 @@ The plotting functions have been tested within several case studies, including C
  ```
 
 ## MARVL Configuration
-- The MARVL user instruction documentation is available in docs/MARVL user instruction.docx
+- The MARVL user instruction documentation is available in docs folder, or please refer to the [wiki](https://github.com/AquaticEcoDynamics/aed-marvl/wiki) pages for examples.
  

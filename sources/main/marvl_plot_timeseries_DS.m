@@ -285,7 +285,7 @@ for var = config.start_plot_ID:config.end_plot_ID
                     hlp=get(leg,'Position');
                     
                     if strcmpi(config.SkillStyle,'tailor')
-                        dim=[hlp(1)-0.04 0.15 0.35 0.4];
+                        dim=[hlp(1)-0.08 0.15 0.35 0.4];
                         
                         axes('Position',dim);
                         obs=errorMatrix.(regexprep(shp(site).Name,' ','_')).(loadname).rawOBS;
@@ -352,18 +352,18 @@ for var = config.start_plot_ID:config.end_plot_ID
         
         if isfield(config,'filetype')
             if strcmpi(config.filetype,'png')
-                print(gcf,'-dpng',regexprep(finalname_p,'.eps','.png'),'-r300');
+                print(gcf,'-dpng',regexprep(finalname_p,'\.eps','.png'),'-r300');
             else
-                %saveas(gcf,regexprep(finalname_p,'.eps','.png'));
+                %saveas(gcf,regexprep(finalname_p,'\.eps','.png'));
                 %  finalname_p2 = [savedir,'eps/',final_sitename];
                 %  saveas(gcf,finalname_p2,'epsc');
-                exportgraphics(gcf,regexprep(finalname_p,'.eps','.jpg'),'Resolution',300)
+                exportgraphics(gcf,regexprep(finalname_p,'\.eps','.jpg'),'Resolution',300)
             end
         else
-            %saveas(gcf,regexprep(finalname_p,'.eps','.png'));
+            %saveas(gcf,regexprep(finalname_p,'\.eps','.png'));
             finalname_p2 = [savedir,'eps/',final_sitename];
             %  saveas(gcf,finalname_p2,'epsc');
-            exportgraphics(gcf,regexprep(finalname_p,'.eps','.jpg'),'Resolution',300)
+            exportgraphics(gcf,regexprep(finalname_p,'\.eps','.jpg'),'Resolution',300)
         end
         
         close all force;
@@ -434,7 +434,6 @@ if isvalidation
     for i = 1:length(sitenames)
        % vars = fieldnames(fdata.(sitenames{i}));
        if isfield(fdata.(sitenames{i}),loadname)
-	       disp(sitenames{i});
            Vertical_Ref=fdata.(sitenames{i}).(loadname).Deployment;
            X = fdata.(sitenames{i}).(loadname).X;
            Y = fdata.(sitenames{i}).(loadname).Y;
@@ -538,21 +537,20 @@ if config.plotmodel
     end
     
     if strcmpi(layer,'bottom') == 1
-        fig3=plot(xdata,ydata,'color',colour{2},'linewidth',0.5,...
+        plot(xdata,ydata,'color',colour{2},'linewidth',0.5,...
             'DisplayName',[leg,' (Bot Median)'],...
             'linestyle',config.ncfile(mod).symbol{2});hold on;
-		uistack(fig3,'bottom');	
     else
         
-        fig3=plot(xdata,ydata,'color',colour{1},'linewidth',0.5,...
+        plot(xdata,ydata,'color',colour{1},'linewidth',0.5,...
             'DisplayName',[leg,' (Surf Median)'],...
             'linestyle',config.ncfile(mod).symbol{1});hold on;
-		uistack(fig3,'bottom');		
     end
 end
 
 %  add field data if isvalidation
 if isvalidation && mod == 1
+        marvl_sort_agency_information('__reset__');
     if ~isempty(sss)
         
         site_string = ['     field: '];
@@ -635,9 +633,13 @@ if isvalidation && mod == 1
                     % define symbols and colors for different agencies, for new sites simply add the
                     %   new agency names into the 'AgencyNameCollection' list in the
                     %   'marvl_sort_agency_information.m' script;
-                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency, fdata);
-                    agencyused = [agencyused;{agencyname}];
-                    
+                    %[mface, mcolor, agencyname] = marvl_sort_agency_information_old(agency);
+                    [mface, mcolor, markerSize, agencyname] = marvl_sort_agency_information(agency, numel(ydata_d));
+                    %agencyused = [agencyused;{agencyname}];
+                    if ~any(strcmpi(agencyused, agencyname))
+                        agencyused = [agencyused; {agencyname}];
+                   end
+
                     if strcmpi(style,'matlab')
                         edge_color=config.edge_color;
                         colour=config.ncfile(mod).colour;
@@ -654,7 +656,7 @@ if isvalidation && mod == 1
                             if fgf > 1
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{2},'markerfacecolor',...
-                                    mcolor,'markersize',3,'HandleVisibility','off');hold on
+                                    mcolor,'markersize',markerSize,'HandleVisibility','off');hold on
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -666,7 +668,7 @@ if isvalidation && mod == 1
                             else
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{2},'markerfacecolor',mcolor,...
-                                    'markersize',3,'displayname',[agency,' (Bot)']);hold on; %,' Surf'
+                                    'markersize',markerSize,'displayname',[agency,' (Bot)']);hold on; %,' Surf'
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -681,7 +683,7 @@ if isvalidation && mod == 1
                             if fgf > 1
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{1},'markerfacecolor',...
-                                    mcolor,'markersize',3,'HandleVisibility','off');hold on
+                                    mcolor,'markersize',markerSize,'HandleVisibility','off');hold on
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -693,7 +695,7 @@ if isvalidation && mod == 1
                             else
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{1},'markerfacecolor',mcolor,...
-                                    'markersize',3,'displayname',[agency,' (Surf)']);hold on; %,' Surf'
+                                    'markersize',markerSize,'displayname',[agency,' (Surf)']);hold on; %,' Surf'
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -763,7 +765,7 @@ if isvalidation && mod == 1
 end
 
 if config.add_error && mod==1
-    if (exist('xdata_dt','var') && ~isempty(xdata_dt) && ~isnan(mean(data_to_plot(:))))
+    if (exist('xdata_dt','var') && ~isempty(xdata_dt))
         
         disp('find field data ...');
         
@@ -793,7 +795,6 @@ if config.add_error && mod==1
                     % tmprange=mean(simrange(:,tmpinds),2);
                     % tmpobs=obsData(uu,2);
                     tmpobs=ydata_dt(uu);
-					%save('data2check.mat','tmp*','allday*','data_to_plot','-mat');
                     
                     if (isnan(tmpobs) || (tmpobs<=tmprange(end) && tmpobs>=tmprange(1)))
                         % simData(uu,2)=tmpobs;
@@ -989,7 +990,8 @@ if isvalidation
                     % define symbols and colors for different agencies, for new sites simply add the
                     %   new agency names into the 'AgencyNameCollection' list in the
                     %   'marvl_sort_agency_information.m' script;
-                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency, fdata);
+                    [mface, mcolor, markerSize, agencyname] = marvl_sort_agency_information(agency, numel(ydata_d));
+                    %[mface, mcolor, agencyname] = marvl_sort_agency_information_old(agency);
                     agencyused = [agencyused;{agencyname}];
                     
                     if strcmpi(style,'matlab')
@@ -1008,7 +1010,7 @@ if isvalidation
                             if fgf > 1
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{2},'markerfacecolor',...
-                                    mcolor,'markersize',3,'HandleVisibility','off');hold on
+                                    mcolor,'markersize',markerSize,'HandleVisibility','off');hold on
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -1020,7 +1022,7 @@ if isvalidation
                             else
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{2},'markerfacecolor',mcolor,...
-                                    'markersize',3,'displayname',[agency,' (Bot)']);hold on; %,' Surf'
+                                    'markersize',markerSize,'displayname',[agency,' (Bot)']);hold on; %,' Surf'
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -1035,7 +1037,7 @@ if isvalidation
                             if fgf > 1
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{1},'markerfacecolor',...
-                                    mcolor,'markersize',3,'HandleVisibility','off');hold on
+                                    mcolor,'markersize',markerSize,'HandleVisibility','off');hold on
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -1047,7 +1049,7 @@ if isvalidation
                             else
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{1},'markerfacecolor',mcolor,...
-                                    'markersize',3,'displayname',[agency,' (Surf)']);hold on; %,' Surf'
+                                    'markersize',markerSize,'displayname',[agency,' (Surf)']);hold on; %,' Surf'
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -1096,25 +1098,7 @@ if isvalidation
             disp(site_string)
         end
         clear site_string;
-    
-	else
-	if strcmpi(layer,'bottom') == 1
-	
-	fp = plot(0,NaN,'k','markeredgecolor',...
-        'k','markerfacecolor',...
-        'k','markersize',3,'displayname','no BOT data');hold on
-    uistack(fp,'top');
-	else
-	fp = plot(0,NaN,'k','markeredgecolor',...
-        'k','markerfacecolor',...
-        'k','markersize',3,'displayname','no SURF data');hold on
-    uistack(fp,'top');
-	
-	end
-	%agencyused = [];
-	%agencyused = [agencyused;{'no data'}];
-	
-	end
+    end
 end
 
 end

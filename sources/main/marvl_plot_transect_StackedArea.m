@@ -51,8 +51,9 @@ if length(master.ncfile)>1
 end
 
 if isvalidation
-field = load(master.fielddata_matfile);
-fdata = field.(master.fielddata); clear field;
+%field = load(master.fielddata_matfile);
+%fdata = field.(master.fielddata); clear field;
+fdata = marvl_load_fielddata(master);
 end
 
 for tim = 1:length(def.pdates)

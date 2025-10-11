@@ -24,8 +24,11 @@ modtime=floor(timestep);
 
 
 % define field data file
-field = load(master.fielddata_matfile);
-fdata = field.(master.fielddata); clear field;
+
+%field = load(master.fielddata_matfile);
+%fdata = field.(master.fielddata); clear field;
+
+fdata = marvl_load_fielddata(master);
 shp=shaperead(config.polygon_file);
 
 %% general plotting features
@@ -219,7 +222,7 @@ for var = config.start_plot_ID:config.end_plot_ID
         set(gca,'ylim',config.cAxis(var).value);
     end
     
-    hl=legend('modelled','observed','Location','east');
+    hl=legend('modelled','observed','Location',config.legendLoc);
     %title('(a) modelled vs. observed TP: box chart');
     
     axes('position',pos2);

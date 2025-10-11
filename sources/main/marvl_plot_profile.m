@@ -81,8 +81,9 @@ for var = config.start_plot_ID:config.end_plot_ID
             
             if config.plotvalidation
                 % load field data
-                fieldt=load(master.fielddata_matfile);
-                field=fieldt.(master.fielddata);
+               % fieldt=load(master.fielddata_matfile);
+               % field=fieldt.(master.fielddata);
+				field = marvl_load_fielddata(master);
                 
                 sites=fieldnames(field);
                 

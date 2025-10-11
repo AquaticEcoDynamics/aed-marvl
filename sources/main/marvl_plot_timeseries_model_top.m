@@ -1,4 +1,4 @@
-function marvl_plot_timeseries(MARVLs,style)
+function marvl_plot_timeseries_model_top(MARVLs,style)
 %**************************************************************************
 %
 % This is AED-Marvl version 1.0 (SEPT-2022)
@@ -285,7 +285,7 @@ for var = config.start_plot_ID:config.end_plot_ID
                     hlp=get(leg,'Position');
                     
                     if strcmpi(config.SkillStyle,'tailor')
-                        dim=[hlp(1)-0.04 0.15 0.35 0.4];
+                        dim=[hlp(1)-0.08 0.12 0.35 0.4];
                         
                         axes('Position',dim);
                         obs=errorMatrix.(regexprep(shp(site).Name,' ','_')).(loadname).rawOBS;
@@ -330,9 +330,9 @@ for var = config.start_plot_ID:config.end_plot_ID
                         set(axl(1).handle,'fontweight','normal');
                         
                     else
-                        dim=[hlp(1)+0.025 0.25 0.15 0.1];
+                        dim=[hlp(1)-0.032 0.25 0.15 0.1];
                         ha=annotation('textbox',dim,'String',...
-                            skill_summary,'FitBoxToText','on','FontName',master.font,'Interpreter','tex'); %'FixedWidth'
+                            skill_summary,'FitBoxToText','on','FontName',master.font,'Interpreter','tex','LineStyle','none'); %'FixedWidth'
                         set(ha,'FontSize',master.legendsize);
                         
                     end
@@ -434,7 +434,6 @@ if isvalidation
     for i = 1:length(sitenames)
        % vars = fieldnames(fdata.(sitenames{i}));
        if isfield(fdata.(sitenames{i}),loadname)
-	       disp(sitenames{i});
            Vertical_Ref=fdata.(sitenames{i}).(loadname).Deployment;
            X = fdata.(sitenames{i}).(loadname).X;
            Y = fdata.(sitenames{i}).(loadname).Y;
@@ -481,7 +480,7 @@ if config.plotmodel && config.isModelRange == 1
             config.dimc,config.ncfile(mod).col_pal_color_bot(1,:));hold on
         set(fig,'DisplayName',[leg,' (Bot 5^{th}-95^{th})']); %Surf
         set(fig,'FaceAlpha', config.alph);
-        uistack(fig,'bottom');
+        uistack(fig,'top');
         hold on;
         
         for plim_i=2:(nn-1)
@@ -491,9 +490,8 @@ if config.plotmodel && config.isModelRange == 1
             set(fig2,'DisplayName',[leg,' (Bot 25^{th}-75^{th})']); %Surf
             % set(fig2,'HandleVisibility','off');
             set(fig2,'FaceAlpha', config.alph);
-            uistack(fig2,'bottom');
+            uistack(fig2,'top');
         end
-        
         
     else
         
@@ -502,7 +500,7 @@ if config.plotmodel && config.isModelRange == 1
         set(fig,'DisplayName',[leg,' (Surf 5^{th}-95^{th})']); %Surf
         set(fig,'FaceAlpha', config.alph);
         hold on;
-        uistack(fig,'bottom');
+        uistack(fig,'top');
         
         for plim_i=2:(nn-1)
             fig2 = fillyy(data(mod).date,data_to_plot(plim_i,:),...
@@ -511,7 +509,7 @@ if config.plotmodel && config.isModelRange == 1
             % set(fig2,'HandleVisibility','off');
             set(fig2,'DisplayName',[leg,' (Surf 25^{th}-75^{th})']); %Surf
             set(fig2,'FaceAlpha', config.alph);
-            uistack(fig2,'bottom');
+            uistack(fig2,'top');
         end
         
     end
@@ -538,16 +536,14 @@ if config.plotmodel
     end
     
     if strcmpi(layer,'bottom') == 1
-        fig3=plot(xdata,ydata,'color',colour{2},'linewidth',0.5,...
+        plot(xdata,ydata,'color',colour{2},'linewidth',0.5,...
             'DisplayName',[leg,' (Bot Median)'],...
             'linestyle',config.ncfile(mod).symbol{2});hold on;
-		uistack(fig3,'bottom');	
     else
         
-        fig3=plot(xdata,ydata,'color',colour{1},'linewidth',0.5,...
+        plot(xdata,ydata,'color',colour{1},'linewidth',0.5,...
             'DisplayName',[leg,' (Surf Median)'],...
             'linestyle',config.ncfile(mod).symbol{1});hold on;
-		uistack(fig3,'bottom');		
     end
 end
 
@@ -728,24 +724,24 @@ if isvalidation && mod == 1
                                             if fgf > 1
                                                 fp = plot(xdata_d(ggg),rdata,'b+',...
                                                     'markersize',4,'linewidth',1,'HandleVisibility','off');hold on
-                                                uistack(fp,'top');
+                                                uistack(fp,'bottom');
                                             else
                                                 fp = plot(xdata_d(ggg),rdata,'b+',...
                                                     'markersize',4,'linewidth',1,'displayname','Outside Range (Bot)');hold on
-                                                uistack(fp,'top');
+                                                uistack(fp,'bottom');
                                             end
                                         else
                                             if fgf > 1
                                                 fp = plot(xdata_d(ggg),rdata,'k+',...
                                                     'markersize',4,'linewidth',1,'HandleVisibility','off');hold on
-                                                uistack(fp,'top');
+                                                uistack(fp,'bottom');
                                             else
                                                 fp = plot(xdata_d(ggg),rdata,'k+',...
                                                     'markersize',4,'linewidth',1,'displayname','Outside Range (Surf)');hold on
-                                                uistack(fp,'top');
+                                                uistack(fp,'bottom');
                                             end
                                         end
-                                        uistack(fp,'top');
+                                        uistack(fp,'bottom');
                                     end
                                 end
                             end

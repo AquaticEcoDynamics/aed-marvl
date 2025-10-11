@@ -2,6 +2,25 @@ function [mface,mcolor,agencyname] = sort_agency_information_Coorong(agency)
 
 switch agency
     
+	 % CS
+    case 'CSMC'
+        mface = 'ok';
+        mcolor = [190 174 212]/255;
+       % agency = 'DEW ALS';
+    case 'WC'
+        mface = 'sk';
+        mcolor = [190 174 212]/255;   
+       % agency = 'DEW AWQC';
+    case 'DEW WDSA Hydro'
+        mface = 'dk';
+        mcolor = [190 174 212]/255;        
+   case 'DEW WDSA Met'
+        mface = '^k';
+        mcolor = [190 174 212]/255; 
+    case 'DEW WDSA Sonde'
+         mface = 'vk';
+        mcolor = [190 174 212]/255;
+		
     % Coorong
     case 'ALS'
         mface = 'ok';

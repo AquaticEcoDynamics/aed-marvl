@@ -1,4 +1,4 @@
-function [data,c_units,isConv,ylab] = tfv_getmodelpolylinedata_stacked(rawData,filename,X,Y,shp,varname,timebin,isSurf,isSpherical)
+function [data,c_units,isConv,ylab] = tfv_getmodelpolylinedata_alldata(rawData,filename,X,Y,shp,varname,timebin,isSurf,isSpherical)
 
 rawGeo = tfv_readnetcdf(filename,'timestep',1);
 mtime = tfv_readnetcdf(filename,'time',1);
@@ -52,6 +52,8 @@ if isSurf
 else
     uData =  rawData.(varname{1})(botIndex,thetime);
 end
+
+data.raw=uData;
 
 pred_lims = [0.05,0.25,0.5,0.75,0.95];
 num_lims = length(pred_lims);

@@ -5,7 +5,7 @@ Y=d_data.all_cellsY;
 sX=shp.X;
 sY=shp.Y;
 D=d_data.D;
-layerface=d_data.layerface;
+%layerface=d_data.layerface;
 rawGeo=d_data.rawGeo;
 tdate=d_data.tdate;
 depth_range=config.depth_range;
@@ -52,13 +52,16 @@ if length(sss) > 1
         botIndex(iii) = max(Cell_3D_IDs);
     end
     
+    vars2D={'H','D','cell_A','cell_Zb','WVHT','WVPER','WVDIR','WVSTR_x',...
+        'WVSTR_y','LW_RAD','PRECIP','REL_HUM','SW_RAD','W10_x','W10_y'};
     if ~use_matfiles
-        if strcmp(varname{1},'H') == 0 & strcmp(varname{1},'D') == 0 & strcmp(varname{1},'cell_A') == 0 & strcmp(varname{1},'cell_Zb') == 0 & strcmp(varname{1},'WVHT') == 0 & strcmp(varname{1},'W10_x') == 0 & strcmp(varname{1},'W10_y') == 0
-            data.surface = rawData.(varname{1})(surfIndex,:);
-            data.bottom = rawData.(varname{1})(botIndex,:);
-        else
+        %if strcmp(varname{1},'H') == 0 & strcmp(varname{1},'D') == 0 & strcmp(varname{1},'cell_A') == 0 & strcmp(varname{1},'cell_Zb') == 0 & strcmp(varname{1},'WVHT') == 0 & strcmp(varname{1},'W10_x') == 0 & strcmp(varname{1},'W10_y') == 0
+        if sum(strcmp(vars2D,varname{1}))>0
             data.surface = rawData.(varname{1})(pt_id,:);
             data.bottom = rawData.(varname{1})(pt_id,:);
+        else
+            data.surface = rawData.(varname{1})(surfIndex,:);
+            data.bottom = rawData.(varname{1})(botIndex,:);
         end
     else
         

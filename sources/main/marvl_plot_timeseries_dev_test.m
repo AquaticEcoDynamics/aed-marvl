@@ -1,4 +1,4 @@
-function marvl_plot_timeseries(MARVLs,style)
+%function marvl_plot_timeseries_dev(MARVLs,style)
 %**************************************************************************
 %
 % This is AED-Marvl version 1.0 (SEPT-2022)
@@ -36,11 +36,11 @@ function marvl_plot_timeseries(MARVLs,style)
 %**************************************************************************
 disp('plot_timeseries: START');
 %
-% clear; close all;
-% run('W:\csiem\csiem-marvl-dev\config\MARVL_WQ.m');
+ clear; close all;
+ run('W:\csiem\csiem-marvl-dev\config\MARVL_WQ.m');
 master=MARVLs.master;
 config=MARVLs.timeseries;
-%style='matlab';
+style='matlab';
 % load in and check configurations
 config=check_TS_configs(config);
 
@@ -214,8 +214,8 @@ for var = config.start_plot_ID:config.end_plot_ID
             end
         else
             if config.isylabel
-                if master.add_human
-                    ylabel([loadname_human,' '],...
+                if config.add_human
+                    ylabel([loadname_human,' (model units)'],...
                         'fontsize',master.ylabelsize,'color',[0.0 0.0 0.0],...
                         'horizontalalignment','center');
                 else
@@ -285,7 +285,7 @@ for var = config.start_plot_ID:config.end_plot_ID
                     hlp=get(leg,'Position');
                     
                     if strcmpi(config.SkillStyle,'tailor')
-                        dim=[hlp(1)-0.04 0.15 0.35 0.4];
+                        dim=[hlp(1)-0.08 0.15 0.35 0.4];
                         
                         axes('Position',dim);
                         obs=errorMatrix.(regexprep(shp(site).Name,' ','_')).(loadname).rawOBS;
@@ -402,7 +402,7 @@ end
 disp('');
 disp('plottfv_polygon: DONE');
 
-end
+%end
 
 %%
 % *************************************************************
@@ -434,7 +434,6 @@ if isvalidation
     for i = 1:length(sitenames)
        % vars = fieldnames(fdata.(sitenames{i}));
        if isfield(fdata.(sitenames{i}),loadname)
-	       disp(sitenames{i});
            Vertical_Ref=fdata.(sitenames{i}).(loadname).Deployment;
            X = fdata.(sitenames{i}).(loadname).X;
            Y = fdata.(sitenames{i}).(loadname).Y;
@@ -538,16 +537,14 @@ if config.plotmodel
     end
     
     if strcmpi(layer,'bottom') == 1
-        fig3=plot(xdata,ydata,'color',colour{2},'linewidth',0.5,...
+        plot(xdata,ydata,'color',colour{2},'linewidth',0.5,...
             'DisplayName',[leg,' (Bot Median)'],...
             'linestyle',config.ncfile(mod).symbol{2});hold on;
-		uistack(fig3,'bottom');	
     else
         
-        fig3=plot(xdata,ydata,'color',colour{1},'linewidth',0.5,...
+        plot(xdata,ydata,'color',colour{1},'linewidth',0.5,...
             'DisplayName',[leg,' (Surf Median)'],...
             'linestyle',config.ncfile(mod).symbol{1});hold on;
-		uistack(fig3,'bottom');		
     end
 end
 
@@ -635,7 +632,7 @@ if isvalidation && mod == 1
                     % define symbols and colors for different agencies, for new sites simply add the
                     %   new agency names into the 'AgencyNameCollection' list in the
                     %   'marvl_sort_agency_information.m' script;
-                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency, fdata);
+                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency);
                     agencyused = [agencyused;{agencyname}];
                     
                     if strcmpi(style,'matlab')
@@ -763,7 +760,7 @@ if isvalidation && mod == 1
 end
 
 if config.add_error && mod==1
-    if (exist('xdata_dt','var') && ~isempty(xdata_dt) && ~isnan(mean(data_to_plot(:))))
+    if (exist('xdata_dt','var') && ~isempty(xdata_dt))
         
         disp('find field data ...');
         
@@ -793,7 +790,6 @@ if config.add_error && mod==1
                     % tmprange=mean(simrange(:,tmpinds),2);
                     % tmpobs=obsData(uu,2);
                     tmpobs=ydata_dt(uu);
-					%save('data2check.mat','tmp*','allday*','data_to_plot','-mat');
                     
                     if (isnan(tmpobs) || (tmpobs<=tmprange(end) && tmpobs>=tmprange(1)))
                         % simData(uu,2)=tmpobs;
@@ -875,6 +871,7 @@ if isvalidation
 
     sss=[];
     inc=1;
+
     for i = 1:length(sitenames)
        % vars = fieldnames(fdata.(sitenames{i}));
        if isfield(fdata.(sitenames{i}),loadname)
@@ -908,7 +905,6 @@ if isvalidation
 %         sss=[];
 %     end
 end
-
 
 %  add field data if isvalidation
 if isvalidation
@@ -989,7 +985,7 @@ if isvalidation
                     % define symbols and colors for different agencies, for new sites simply add the
                     %   new agency names into the 'AgencyNameCollection' list in the
                     %   'marvl_sort_agency_information.m' script;
-                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency, fdata);
+                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency);
                     agencyused = [agencyused;{agencyname}];
                     
                     if strcmpi(style,'matlab')
@@ -1096,25 +1092,14 @@ if isvalidation
             disp(site_string)
         end
         clear site_string;
-    
-	else
-	if strcmpi(layer,'bottom') == 1
-	
-	fp = plot(0,NaN,'k','markeredgecolor',...
-        'k','markerfacecolor',...
-        'k','markersize',3,'displayname','no BOT data');hold on
-    uistack(fp,'top');
-	else
-	fp = plot(0,NaN,'k','markeredgecolor',...
-        'k','markerfacecolor',...
-        'k','markersize',3,'displayname','no SURF data');hold on
-    uistack(fp,'top');
-	
-	end
-	%agencyused = [];
-	%agencyused = [agencyused;{'no data'}];
-	
-	end
+        
+    else
+        xdata_d=config.datearray(1)-100;
+        fp = plot(xdata_d,ones(size(xdata_d)),'ko','markeredgecolor',...
+             'k','markerfacecolor','k',...
+             'markersize',3,'displayname','Empty');hold on;
+        
+    end
 end
 
 end

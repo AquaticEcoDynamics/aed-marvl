@@ -1,4 +1,4 @@
-function marvl_plot_timeseries(MARVLs,style)
+function marvl_plot_timeseries_dev(MARVLs,style)
 %**************************************************************************
 %
 % This is AED-Marvl version 1.0 (SEPT-2022)
@@ -37,7 +37,7 @@ function marvl_plot_timeseries(MARVLs,style)
 disp('plot_timeseries: START');
 %
 % clear; close all;
-% run('W:\csiem\csiem-marvl-dev\config\MARVL_WQ.m');
+% run('E:\database\MARVL\examples\Cockburn_Sound\MARVL.m');
 master=MARVLs.master;
 config=MARVLs.timeseries;
 %style='matlab';
@@ -67,9 +67,8 @@ fdata = struct;
 isvalidation=master.add_fielddata;
 
 if isvalidation
-   % field = load(master.fielddata_matfile);
-   % fdata = field.(master.fielddata); clear field;
-    fdata = marvl_load_fielddata(master);
+    field = load(master.fielddata_matfile);
+    fdata = field.(master.fielddata); clear field;
 end
 
 % place-holder for model skill matrix
@@ -214,8 +213,8 @@ for var = config.start_plot_ID:config.end_plot_ID
             end
         else
             if config.isylabel
-                if master.add_human
-                    ylabel([loadname_human,' '],...
+                if config.add_human
+                    ylabel([loadname_human,' (model units)'],...
                         'fontsize',master.ylabelsize,'color',[0.0 0.0 0.0],...
                         'horizontalalignment','center');
                 else
@@ -285,7 +284,7 @@ for var = config.start_plot_ID:config.end_plot_ID
                     hlp=get(leg,'Position');
                     
                     if strcmpi(config.SkillStyle,'tailor')
-                        dim=[hlp(1)-0.04 0.15 0.35 0.4];
+                        dim=[hlp(1)-0.08 0.15 0.35 0.4];
                         
                         axes('Position',dim);
                         obs=errorMatrix.(regexprep(shp(site).Name,' ','_')).(loadname).rawOBS;
@@ -428,35 +427,17 @@ ydata_dt=[];
 % if isvalidatoin, finding field sites within each polygon
 if isvalidation
     sitenames = fieldnames(fdata);
-
-    sss=[];
-    inc=1;
+    
+    X=zeros(size(sitenames));
+    Y=zeros(size(sitenames));
     for i = 1:length(sitenames)
-       % vars = fieldnames(fdata.(sitenames{i}));
-       if isfield(fdata.(sitenames{i}),loadname)
-	       disp(sitenames{i});
-           Vertical_Ref=fdata.(sitenames{i}).(loadname).Deployment;
-           X = fdata.(sitenames{i}).(loadname).X;
-           Y = fdata.(sitenames{i}).(loadname).Y;
-                 
-           if strcmpi(Vertical_Ref,'Integrated') 
-               if config.includeINT
-                 inpol = inpolygon(X,Y,shp(site).X,shp(site).Y);
-                 if inpol
-                     sss(inc)=i;
-                     inc=inc+1;
-                 end
-               end
-           else
-               inpol = inpolygon(X,Y,shp(site).X,shp(site).Y);
-                 if inpol
-                     sss(inc)=i;
-                     inc=inc+1;
-                 end
-
-           end
-       end
+        vars = fieldnames(fdata.(sitenames{i}));
+        X(i) = fdata.(sitenames{i}).(vars{1}).X;
+        Y(i) = fdata.(sitenames{i}).(vars{1}).Y;
     end
+    
+    inpol = inpolygon(X,Y,shp(site).X,shp(site).Y);
+    sss = find(inpol == 1);
 end
 
 % going through surface or bottom layers (only one selection, default surf)
@@ -538,16 +519,14 @@ if config.plotmodel
     end
     
     if strcmpi(layer,'bottom') == 1
-        fig3=plot(xdata,ydata,'color',colour{2},'linewidth',0.5,...
+        plot(xdata,ydata,'color',colour{2},'linewidth',0.5,...
             'DisplayName',[leg,' (Bot Median)'],...
             'linestyle',config.ncfile(mod).symbol{2});hold on;
-		uistack(fig3,'bottom');	
     else
         
-        fig3=plot(xdata,ydata,'color',colour{1},'linewidth',0.5,...
+        plot(xdata,ydata,'color',colour{1},'linewidth',0.5,...
             'DisplayName',[leg,' (Surf Median)'],...
             'linestyle',config.ncfile(mod).symbol{1});hold on;
-		uistack(fig3,'bottom');		
     end
 end
 
@@ -569,8 +548,13 @@ if isvalidation && mod == 1
                     else
                         fdata.(sitenames{sss(j)}).(loadname).Depth=zeros(size(fdata.(sitenames{sss(j)}).(loadname).Data)+(config.depthTHRESH-1));
                     end
+                    %	elseif strcmpi(Vertical_Ref,'BOT')
+                    %	    Site_Depth=fdata.(sitenames{sss(j)}).(loadname).Site_Depth;
+                    %	    fdata.(sitenames{sss(j)}).(loadname).Depth=-(Site_Depth-fdata.(sitenames{sss(j)}).(loadname).Height);
                 end
-
+                
+                
+                
                 if ~config.validation_raw
                     %                     [xdata_ta,ydata_ta,ydata_max_ta,ydata_min_ta] = ...
                     %                         get_field_at_depth_thresh(fdata.(sitenames{sss(j)}).(loadname).Date,...
@@ -635,7 +619,7 @@ if isvalidation && mod == 1
                     % define symbols and colors for different agencies, for new sites simply add the
                     %   new agency names into the 'AgencyNameCollection' list in the
                     %   'marvl_sort_agency_information.m' script;
-                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency, fdata);
+                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency);
                     agencyused = [agencyused;{agencyname}];
                     
                     if strcmpi(style,'matlab')
@@ -654,7 +638,7 @@ if isvalidation && mod == 1
                             if fgf > 1
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{2},'markerfacecolor',...
-                                    mcolor,'markersize',3,'HandleVisibility','off');hold on
+                                    edge_color{2},'markersize',3,'HandleVisibility','off');hold on
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -665,7 +649,7 @@ if isvalidation && mod == 1
                                 uistack(fp,'top');
                             else
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
-                                    edge_color{2},'markerfacecolor',mcolor,...
+                                    edge_color{2},'markerfacecolor',edge_color{2},...
                                     'markersize',3,'displayname',[agency,' (Bot)']);hold on; %,' Surf'
                                 uistack(fp,'top');
                                 if config.validation_minmax
@@ -681,7 +665,7 @@ if isvalidation && mod == 1
                             if fgf > 1
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
                                     edge_color{1},'markerfacecolor',...
-                                    mcolor,'markersize',3,'HandleVisibility','off');hold on
+                                    edge_color{1},'markersize',3,'HandleVisibility','off');hold on
                                 uistack(fp,'top');
                                 if config.validation_minmax
                                     fp = plot(xdata_d,ydata_max_d,'+','color',[0.6 0.6 0.6],...
@@ -692,7 +676,7 @@ if isvalidation && mod == 1
                                 uistack(fp,'top');
                             else
                                 fp = plot(xdata_d,ydata_d,mface,'markeredgecolor',...
-                                    edge_color{1},'markerfacecolor',mcolor,...
+                                    edge_color{1},'markerfacecolor',edge_color{1},...
                                     'markersize',3,'displayname',[agency,' (Surf)']);hold on; %,' Surf'
                                 uistack(fp,'top');
                                 if config.validation_minmax
@@ -763,7 +747,7 @@ if isvalidation && mod == 1
 end
 
 if config.add_error && mod==1
-    if (exist('xdata_dt','var') && ~isempty(xdata_dt) && ~isnan(mean(data_to_plot(:))))
+    if (exist('xdata_dt','var') && ~isempty(xdata_dt))
         
         disp('find field data ...');
         
@@ -793,7 +777,6 @@ if config.add_error && mod==1
                     % tmprange=mean(simrange(:,tmpinds),2);
                     % tmpobs=obsData(uu,2);
                     tmpobs=ydata_dt(uu);
-					%save('data2check.mat','tmp*','allday*','data_to_plot','-mat');
                     
                     if (isnan(tmpobs) || (tmpobs<=tmprange(end) && tmpobs>=tmprange(1)))
                         % simData(uu,2)=tmpobs;
@@ -872,41 +855,17 @@ ydata_dt=[];
 % if isvalidatoin, finding field sites within each polygon
 if isvalidation
     sitenames = fieldnames(fdata);
-
-    sss=[];
-    inc=1;
+    
+    X=zeros(size(sitenames));
+    Y=zeros(size(sitenames));
     for i = 1:length(sitenames)
-       % vars = fieldnames(fdata.(sitenames{i}));
-       if isfield(fdata.(sitenames{i}),loadname)
-           Vertical_Ref=fdata.(sitenames{i}).(loadname).Deployment;
-           X = fdata.(sitenames{i}).(loadname).X;
-           Y = fdata.(sitenames{i}).(loadname).Y;
-                 
-           if strcmpi(Vertical_Ref,'Integrated') 
-               if config.includeINT
-                 inpol = inpolygon(X,Y,shp(site).X,shp(site).Y);
-                 if inpol
-                     sss(inc)=i;
-                     inc=inc+1;
-                 end
-               end
-           else
-               inpol = inpolygon(X,Y,shp(site).X,shp(site).Y);
-                 if inpol
-                     sss(inc)=i;
-                     inc=inc+1;
-                 end
-
-           end
-       end
+        vars = fieldnames(fdata.(sitenames{i}));
+        X(i) = fdata.(sitenames{i}).(vars{1}).X;
+        Y(i) = fdata.(sitenames{i}).(vars{1}).Y;
     end
     
-%     if inc>1
-%     inpol = inpolygon(X,Y,shp(site).X,shp(site).Y);
-%     sss = find(inpol == 1);
-%     else
-%         sss=[];
-%     end
+    inpol = inpolygon(X,Y,shp(site).X,shp(site).Y);
+    sss = find(inpol == 1);
 end
 
 
@@ -920,15 +879,6 @@ if isvalidation
             if isfield(fdata.(sitenames{sss(j)}),loadname)
                 xdata_t = [];
                 ydata_t = [];
-                disp(sitenames{sss(j)})
-                Vertical_Ref=fdata.(sitenames{sss(j)}).(loadname).Deployment;
-                if strcmpi(Vertical_Ref,'Integrated') && config.includeINT
-                    if strcmpi(layer,'surface')
-                        fdata.(sitenames{sss(j)}).(loadname).Depth=zeros(size(fdata.(sitenames{sss(j)}).(loadname).Data));
-                    else
-                        fdata.(sitenames{sss(j)}).(loadname).Depth=zeros(size(fdata.(sitenames{sss(j)}).(loadname).Data)+(config.depthTHRESH-1));
-                    end
-                end
                 
                 if ~config.validation_raw
                     %                     [xdata_ta,ydata_ta,ydata_max_ta,ydata_min_ta] = ...
@@ -989,7 +939,7 @@ if isvalidation
                     % define symbols and colors for different agencies, for new sites simply add the
                     %   new agency names into the 'AgencyNameCollection' list in the
                     %   'marvl_sort_agency_information.m' script;
-                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency, fdata);
+                    [mface,mcolor,agencyname] = marvl_sort_agency_information(agency);
                     agencyused = [agencyused;{agencyname}];
                     
                     if strcmpi(style,'matlab')
@@ -1096,25 +1046,7 @@ if isvalidation
             disp(site_string)
         end
         clear site_string;
-    
-	else
-	if strcmpi(layer,'bottom') == 1
-	
-	fp = plot(0,NaN,'k','markeredgecolor',...
-        'k','markerfacecolor',...
-        'k','markersize',3,'displayname','no BOT data');hold on
-    uistack(fp,'top');
-	else
-	fp = plot(0,NaN,'k','markeredgecolor',...
-        'k','markerfacecolor',...
-        'k','markersize',3,'displayname','no SURF data');hold on
-    uistack(fp,'top');
-	
-	end
-	%agencyused = [];
-	%agencyused = [agencyused;{'no data'}];
-	
-	end
+    end
 end
 
 end

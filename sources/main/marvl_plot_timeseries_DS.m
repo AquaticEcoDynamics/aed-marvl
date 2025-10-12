@@ -635,10 +635,10 @@ if isvalidation && mod == 1
                     %   'marvl_sort_agency_information.m' script;
                     %[mface, mcolor, agencyname] = marvl_sort_agency_information_old(agency);
                     [mface, mcolor, markerSize, agencyname] = marvl_sort_agency_information(agency, numel(ydata_d));
-                    %agencyused = [agencyused;{agencyname}];
-                    if ~any(strcmpi(agencyused, agencyname))
-                        agencyused = [agencyused; {agencyname}];
-                   end
+                    agencyused = [agencyused;{agencyname}];
+                    %if ~any(strcmpi(agencyused, agencyname))
+                     %   agencyused = [agencyused; {agencyname}];
+                   %end
 
                     if strcmpi(style,'matlab')
                         edge_color=config.edge_color;

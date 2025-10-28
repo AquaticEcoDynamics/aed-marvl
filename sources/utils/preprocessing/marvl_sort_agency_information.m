@@ -45,15 +45,15 @@ else
     error('AgencyConfigs must be a struct array or cell array.');
 end
 
-% mface_options como celda de char
+% mface_options char
 mface_options = config.mface_options;
 if isstring(mface_options), mface_options = cellstr(mface_options); end
 
-% mcolor_options como matriz Nx3
+% mcolor_options as Nx3 matrix
 mcolor_options = config.mcolor_options;
 if iscell(mcolor_options), mcolor_options = cell2mat(mcolor_options); end
 
-% Defaults si la agencia no aparece
+% Defaults if agancy do not appear
 default_marker = 'xk';
 default_color  = [255, 61, 9] / 255;
 default_size   = 5;
